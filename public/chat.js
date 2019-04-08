@@ -18,9 +18,20 @@ app.controller('chat', function($scope, $http) {
             });
         };
     });
-
+    $scope.kullanicilar = function(){
+        $scope.socket.emit('reqgetusers', function(data){
+            $scope.users = data.split("|")
+            
+        });
+     
+    }
+    
     $scope.herkeseMesajGonder = function (message) {
-        $scope.socket.emit('reqglobal', message, $scope.username, function(data){})
+        $scope.socket.emit('reqglobal', message, $scope.username, function(data){
+             var now = new Date();
+             var nowtext = now.getHours() + ":" + now.getMinutes()
+             $scope.globalMessages.push({'index':$scope.globalMessages.length, 'source':'Siz', 'message':data, 'date':nowtext})
+        })
         var now = new Date();
         var nowtext = now.getHours() + ":" + now.getMinutes()
         $scope.globalMessages.push({'index':$scope.globalMessages.length, 'source':'Siz', 'message':message, 'date':nowtext})
