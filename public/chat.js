@@ -2,8 +2,30 @@ var app = angular.module('myApp', []);
 app.controller('chat', function($scope, $http) {
     $scope.socket = io.connect();
     $scope.username = "";
-    $scope.globalMessages = [];
-    $scope.rooms = [];
+    $scope.globalMessages = []; //Global mesajlar
+    $scope.roomsMessages = {}; //Oda mesajları
+    //{}.degiskenadi = "abc"; delete {"degiskenadi": "abc"};
+    $scope.usersMessage = {};
+
+    $scope.rooms = []; //Açık odalar
+    $scope.users = []; //Açık kullanıcılar
+
+
+    $('#myModal').on('click', function () {
+        setTimeout(function (){
+          if ($scope.username == "")
+            $('#myModal').modal('show');
+          }, 500);
+    });
+
+    $scope.login = function () {
+        if ($scope.username != ""){
+            $('#myModal').modal('hide');
+            $('#input').focus();
+        }else{
+            alert("Lütfen kullanıcı adı giriniz.");
+        }
+    }
 
     app.directive('ngEnter', function () {
         return function (scope, element, attrs) {
@@ -18,13 +40,13 @@ app.controller('chat', function($scope, $http) {
             });
         };
     });
-    $scope.kullanicilar = function(){
-        $scope.socket.emit('reqgetusers', function(data){
-            $scope.users = data.split("|")
-            
-        });
-     
-    }
+    
+    
+    //Kullanıcıları getir
+    $scope.socket.emit('reqgetusers', function(data){
+        $scope.users = data.split("|")
+        $scope.$apply();
+    }); 
     
     $scope.herkeseMesajGonder = function (message) {
         $scope.socket.emit('reqglobal', message, $scope.username, function(data){

@@ -29,6 +29,7 @@ app.get("", function (req, res) {
 var users = [];
 
 io.on('connection', client => {
+    console.log(client.id)
     users.push(client.id)
   
     client.on('disconnect', function () {
@@ -45,12 +46,14 @@ io.on('connection', client => {
         console.log("[" + rooms[0] + "]:'" +  rooms[1] + "' odasına bağlandı.")
     })
     
-    client.on('reqgetusers',function(){
+    client.on('reqgetusers',function(callback){
         var temp = ""
-        for(var clientid in users){
-            temp+=clientid+"|"
+        for(var i in users){
+            temp+=users[i]+"|"
         }
-        temp +="\b";
+        temp = temp.substr(0, temp.length - 1);
+        console.log("kullanıcılar çalıştı:" + temp)
+        callback(temp)
     })
     
 
