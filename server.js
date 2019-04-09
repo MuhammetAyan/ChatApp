@@ -9,7 +9,7 @@ var io = require('socket.io')(server);
 
 rootPath = __dirname ;
 viewsPath = __dirname + "/views/";
-//app.use(logger('dev'));
+app.use(logger('dev'));
 
 //static files
 app.get(/^\/public\/.*$/, function(req, res){
@@ -52,17 +52,11 @@ io.on('connection', client => {
         
         if(i != -1){
             username = users[i]['username']
-            //console.log(users[i] + " " + i)
             client.broadcast.emit("resuserlist", "logout", client.id, username)
             users.splice(i, 1);
         }
     });
-    /*
-    client.join('room', () => {
-        let rooms = Object.keys(client.rooms)
-        console.log("[" + rooms[0] + "]:'" +  rooms[1] + "' odasına bağlandı.")
-    })
-    */
+
     client.on('reqgetusers',function(callback){
         var temp = ""
         for(var i in users){
@@ -104,7 +98,6 @@ io.on('connection', client => {
             var now = new Date();
             var nowtext = now.getHours() + ":" + now.getMinutes()
             client.broadcast.emit('resglobal', message, source, nowtext, client.id);
-            //console.log("[" + source + " " + nowtext +"] " + message);
         }
         
     })
