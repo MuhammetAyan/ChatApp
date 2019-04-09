@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Naber - Giriş Yap</title>
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body class="container bg-secondary">
+    <div class="row align-items-center justify-content-center">
+        <div class="col-lg-5 col-12">
+            <div class="card">
+                <div class="card-header">
+                    Naber
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Giriş Yap</h5>
+                    <p class="card-text"></p>
+                    <form ng-app="naber" ng-controller="login">
+                        <div class="form-group">
+                            <label for="username">Kullanıcı adı</label>
+                            <input type="text" class="form-control" id="username" placeholder="Kullanıcı adı" ng-model="username">
+                        </div>
+                        <div class="form-group">
+                            <label for="Password">Parola</label>
+                            <input type="password" class="form-control" id="Password" placeholder="Parola" ng-model="password">
+                        </div>
+                        <button type="submit" class="btn btn-primary" ng-click="submit()">Giriş Yap</button>
+                        <small class="alert-danger">{{message}}</small>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/public/js/jquery-3.3.1.slim.min.js"></script>
+    <script src="/public/js/popper.min.js"></script>
+    <script src="/public/js/bootstrap.min.js"></script>
+    <script src="/public/js/angular.min.js"></script>
+    <script src="/public/js/login.js"></script>
+</body>
+</html>
