@@ -28,20 +28,35 @@ function writemessage(message, source, nowtext, page=""){
     }
 }
 
+function pageselect(pagename) {
+    activepage = pagename;
+    $('.Panel').hide();
+    $('#' + pagename).show();
+}
+
 function writeuser(id, username){
-    html= '<a class="dropdown-item" href="#" id=' + id +
+    html='<a class="dropdown-item" href="#" id=' + id +
     ' onclick="openuser(\'' + id + '\', \'' + username +'\')">' + username + '</a>';
     $('#userlist').append(html);
+    $('#' + id).on('click', function () {
+        pageselect(id + 'Panel')
+    })
 }
 
-function deleteuser(id){
+//chatbar'dan kullanıcıyı kapatır.
+function closeuser(id){
     $('#' + id).remove();
+    $('#' + id + "Panel").hide();
 }
 
+//chatbar'da kullanıcı için alan oluştur ve sayfasını açar.
 function openuser(id, username) {
     $('.baritem').removeClass("active");
     html = '<a class="nav-item nav-link baritem active" href="#" id="chatbar' + id + '">' + username +'</a>';
     $('#chatbar').append(html);
+    html='<div id="' + id + 'Panel" class="Panel col-12"></div>'
+    $('#Panels').append(html);
+    pageselect(id + "Panel")
 }
 
 //designer

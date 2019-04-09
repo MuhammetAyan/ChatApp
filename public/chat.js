@@ -2,17 +2,17 @@ function herkeseMesajGonder(message) {
     socket.emit('reqglobal', message, username, function(data){
          var now = new Date();
          var nowtext = now.getHours() + ":" + now.getMinutes()
-         writemessage(message, 'Siz', nowtext)
+         writemessage(message, 'Siz', nowtext, "globalPanel")
     })
     var now = new Date();
     var nowtext = now.getHours() + ":" + now.getMinutes()
-    writemessage(message, 'Siz', nowtext)
+    writemessage(message, 'Siz', nowtext, "globalPanel")
 }
 
 //Herkesten mesaj al
 function globallistener(){
     socket.on('resglobal', function(data, source, date) {
-        writemessage(data, source, date)
+        writemessage(data, source, date, "globalPanel")
     }
 )}
 
