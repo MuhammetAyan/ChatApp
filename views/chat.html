@@ -22,16 +22,16 @@
       </div>
       <div class="row">
         <div class="col-4 bg-success">
-          <div class="list-group list-group-flush">
-            <div class="list-group-item" ng-repeat="user in users">{{user}}</div>
+          <div class="list-group list-group-flush" id="userspanel">
+            <div class="list-group-item" ng-repeat="user in users">{{user.username}}</div>
           </div>
         </div>
-        <div class="col-8">
-            <div ng-class="{'alert-info': msg.source=='Siz', 'alert-warning': msg.source!='Siz'}" ng-repeat="msg in globalMessages">
+        <div class="col-8" id ="globalpanel">
+            <!--div ng-class="{'alert-info': msg.source=='Siz', 'alert-warning': msg.source!='Siz'}" ng-repeat="msg in globalMessages">
               <div class="badge badge-dark">{{msg.source}}</div>
               <div class="badge badge-secondary">{{msg.date}}</div>
               <p class="mb-1">{{msg.message}}</p>
-            </div>
+            </div-->
         </div>
       </div>
       <div class="row bg-success">
