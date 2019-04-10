@@ -1,6 +1,7 @@
 var username = ""
 
 $(window).ready(function () {
+    $('#input').focus()
     $('#input').on('keypress', function (e) {
         if(e.which == 13){
             var message = $('#input').val()
