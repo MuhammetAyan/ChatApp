@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 
 rootPath = __dirname ;
 viewsPath = __dirname + "/views/";
-//app.use(logger('dev'));
+app.use(logger('dev'));
 
 
 //static files
