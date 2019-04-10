@@ -60,7 +60,7 @@ io.on('connection', client => {
     client.on('reqgetuserlist', function (callback) {
         //Yetkisi varsa
         kullanicilar = users.filter(x=>x.id != client.id)
-        data = kullanicilar.map(x=>{return {'id': x.id, 'username': x.username}})
+        data = kullanicilar.map(x=>{return {'id': x.id, 'username': x.username, 'type': "user"}})
         callback(data)
     })
 
@@ -75,7 +75,11 @@ io.on('connection', client => {
         }
     })
 
-
+    //Toplu mesaj gönderme
+    client.on('reqgetmessage', function (type, name, callback) {
+        //Yetkisi varsa
+        callback({'message':'', 'sender':'test', 'date': Now()})
+    })
 })
 
 //html requests

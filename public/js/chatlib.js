@@ -5,22 +5,21 @@ function Now() {
 
 function userlistRefresh(data) {
     $('#userlist').html('');
-    html = '<div class="" id="all">Herkes</div>';
-    $('#userlist').append(html);
+    userWrite("", "Herkes", "all")
     data.forEach(element => {
-        html = '<div class="" id="user' + element.id +'">' + element.username +'</div>';
-        $('#userlist').append(html);
+        userWrite(element.id, element.username, element.type)
     });
 }
 
-function userWrite(id, username) {
-    html = '<div class="" id="user' + id +'">' + username +'</div>';
+function userWrite(id, username, type) {
+    html = '<button class="btn btn-light" data="' + type + '" id="' + id +
+    '" onclick="chat.open(\'' + type + "\',\'" + username + '\')">' + username +
+    '</button>';
     $('#userlist').append(html);
 }
 
 function userDelete(id) {
-    html = '<div class="" id="user' + id +'">' + username +'</div>';
-    $('#user' + id).remove();
+    $('#' + id).remove();
 }
 
 function messageWrite(message, sender, date) {
@@ -44,6 +43,14 @@ function messageWrite(message, sender, date) {
     '<p class="mb-1">' + message + '</p>'+
     '</div>';
     $('#chatarea').append(html);
+}
+
+function messageListRefresh(data) {
+    $('#chatarea').html('');
+    data.forEach(element => {
+        alert(element.message);
+        messageWrite(element.message, element.sender, element.date)
+    });
 }
 
 //Design-----------------------------------------------------------------
