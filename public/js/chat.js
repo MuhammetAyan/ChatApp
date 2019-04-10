@@ -1,93 +1,105 @@
-  var username = "";
+var username = ""
+
 $(window).ready(function () {
-  $('#chatpanel').hide();
+    $('#input').on('keypress', function (e) {
+        if(e.which == 13){
+            var message = $('#input').val()
+            msgparser(message)
+            $('#input').val('')
+        }
+    })
 })
-  //login ------------------------------------------------------------
-  var login = {};
 
-  var app = angular.module('naber', []);
-  app.controller('login', function($scope, $http) {
-    $scope.username="";
-    $scope.password = "";
-  $scope.submit = function () {
-    $http({
-      method : "POST",
-      url : "/login",
-      data: {"username": $scope.username, "password": $scope.password},
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then(function mySuccess(response) {
-        username = $scope.username;
-        $('#loginpanel').hide();
-        $('#chatpanel').show();
-        chat.connect();
-    }, function myError(response) {
-      alert("hata");
-    });
-  }
-
-});
-  //chat-----------------------------------------------------------------
-  var chat = {};
-  chat.socket = null;
-  chat.activetype = "all";
-  chat.activename = "";
-
-  //giriş yapma
-  chat.connect = function () {
-    chat.socket = io.connect();
-    chat.socket.emit("reqsignin", username)
-    chat.getuserlist();
-
-    //user changed
-    chat.socket.on('resuserchange', function (status, id, username) {
-      if(status == "login"){
-        userWrite(id, username, "user")
-      }else if(status == "logout"){
-        userDelete(id)
-      }
-    })
-
-    //received messages
-    chat.socket.on('resmessage', function (message, sender, type, name, date) {
-      //Yetkisi varsa
-      if (type == chat.activetype && name == chat.activename){
-        messageWrite(message, sender, date);
-      }else{
-        alert("bildirim");
-      }
-    })
-  }
-
-  //kullanıcı listesi isteği
-  chat.getuserlist = function () {
-    if (chat.socket){
-    chat.socket.emit("reqgetuserlist", function (data) {
-      userlistRefresh(data);
-    })
-  }}
-
-  //message send
-  chat.sendmessage = function (message, username) {
-    if (message != ''){
-      chat.socket.emit("reqmessage", message, chat.activetype, chat.activename);
-      messageWrite(message, 'Siz', Now())
+function writeMessage(message, sender, targets, date) {
+    var html = "";
+    switch (sender) {
+        case "Siz":
+        html = '<div class="alert-info"><span class="badge badge-success">' + sender + '</span>==>' +
+        '<span class="badge badge-warning">' + targets + '</span>' +
+        '<span class="badge badge-secondary">' + date + '</span>' + message + '</div>'
+            break;
+        case "Sistem":
+        html = '<div class="bg-dark text-center text-light" >' +
+        '<span class="badge badge-secondary">' + date + '</span>' + message + '</div>'
+        break;
+        default:
+        html = '<div class="alert-warning" ><span class="badge badge-warning">' + sender + '</span>==>' +
+        '<span class="badge badge-success">' + targets + '</span>' +
+        '<span class="badge badge-secondary">' + date + '</span>' + message + '</div>'
+            classinfo = "alert-warning"
+            break;
     }
-  }
-  
-  $('#send').on('click', function () {
-    chat.sendmessage($('#chatinput').val());
-    $('#chatinput').val('');
-  })
+    $('#chatarea').append(html)
+}
 
-  //odayı açma
-  chat.open = function (type, username) {
-    chat.activetype = type;
-    chat.activename = username;
-    $('#chatarea').html('');
-    chat.socket.emit("reqgetmessage", chat.activetype, chat.activename, function (data) {
-      messageListRefresh(data);
-    });
-  }
+function Now() {
+    var now = new Date();
+    return now.getHours() + ":" + now.getMinutes()
+}
 
+
+function msgparser(code) {
+    if (code == '') return
+    var tokens = code.split('#')
+    switch (tokens[0]) {
+        case 'msg':
+            var message = tokens[2]
+            var targets = tokens[1].split("@")
+            writeMessage(message, 'Siz', targets, Now())
+            sendmessage(message, targets)
+            break
+        case 'all':
+            var message = code.substring(4)
+            writeMessage(message, 'Siz', "all", Now())
+            sendall(message)
+            break
+        case 'login':
+            logout(function () {
+                writeMessage("Çıkış yapıldı.", 'Sistem', '', Now())
+            })
+            var name = tokens[1]
+            login(name, function (status, errmsg) {
+                if (status){
+                    username = name
+                    writeMessage("Giriş yapıldı: " + name, 'Sistem', '', Now())
+                }else{
+                    writeMessage("Giriş yapılamadı: " + errmsg, 'Sistem', '', Now())
+                }
+            })
+            break
+        case 'logout':
+            logout(function () {
+                writeMessage("Çıkış yapıldı.", 'Sistem', '', Now())
+            })
+            break
+        default:
+            writeMessage("Bilinmeyen komut: " + tokens[0], 'Sistem', '', Now())
+            break
+    }
+}
+//soket----------------------------------------------------------------------------------
+var socket = io.connect();
+
+function sendmessage(message, targets) {
+    socket.emit("reqmessage", message, targets)
+}
+
+function sendall(message) {
+    socket.emit("reqmessage", message, "all")
+}
+
+function login(name, callback) {
+    socket.emit("reqlogin", name, callback)
+}
+
+function logout(callback) {
+    socket.emit("reqlogout", callback)
+}
+
+socket.on('resmessage', function (message, sender, targets, date) {
+    writeMessage(message, sender, targets, date)
+})
+
+socket.on('resnotification', function (message) {
+    writeMessage(message, 'Sistem', '', Now())
+})

@@ -9,56 +9,25 @@
     <link rel="stylesheet" href="/public/css/style.css">
     <script src="/socket.io/socket.io.js"></script>
 </head>
-<body class="container bg-secondary">
-    <!--Login-->
-    <div class="row align-items-center justify-content-center" id="loginpanel">
-        <div class="col-lg-5 col-12">
-            <div class="card" ng-app="naber" ng-controller="login">
-                <div class="card-header">
-                    Naber
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title">Giriş Yap</h5>
-                    <p class="card-text"></p>
-                    <form>
-                        <div class="form-group">
-                            <label for="username">Kullanıcı adı</label>
-                            <input type="text" class="form-control" id="username" placeholder="Kullanıcı adı" ng-model="username">
-                        </div>
-                        <div class="form-group">
-                            <label for="Password">Parola</label>
-                            <input type="password" class="form-control" id="password" placeholder="Parola" ng-model="password">
-                        </div>
-                        <button type="submit" class="btn btn-primary" ng-click="submit()">Giriş Yap</button>
-                        <small class="alert-danger">{{message}}</small>
-                    </form>
-                </div>
+<body class="bg-dark">
+    <div class="input-group">
+        <!--div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="komutbuton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                k
+            </button>
+            <div class="dropdown-menu" aria-labelledby="komutbuton">
+                <a class="dropdown-item" href="#">msg</a>
+                <a class="dropdown-item" href="#">all</a>
+                <a class="dropdown-item" href="#">login</a>
+                <a class="dropdown-item" href="#">logout</a>
             </div>
-        </div>
+        </div-->
+        <input type="text" class="form-control" id="input">
     </div>
-    <!--/Login-->
-    <!--Chat-->
-    <div class="row justify-content-center" id="chatpanel">
-        <!--list-->
-        <div class="col-md-5 card" id="userlist">
-        </div>
-        <!--/list-->
-        <!--chatpanel-->
-        <div class="col-md-7">
-            <div class="" id="chatarea"></div>
-            <div class="input-group">
-                <input class="form-control" type="text" id="chatinput">
-                <button class="btn btn-success" type="button" id="send">Gönder</button>
-            </div>
-        </div>
-        <!--/chatpanel-->
-    </div>
-    <!--/Chat-->
-    <script src="/public/js/angular.min.js"></script>
+    <div id="chatarea" class="h-100 w-100 text-light"></div>
     <script src="/public/js/jquery-3.3.1.slim.min.js"></script>
     <script src="/public/js/popper.min.js"></script>
     <script src="/public/js/bootstrap.min.js"></script>
-    <script src="/public/js/chatlib.js"></script>
     <script src="/public/js/chat.js"></script>
 </body>
 </html>

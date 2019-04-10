@@ -24,26 +24,46 @@ app.get("/", function (req, res) {
     res.redirect("/index")
 })
 
-var users = [];
+//html requests
+app.get("/index", function(req, res){
+    res.sendFile("/index.html", {root: viewsPath});
+});
+
+server.listen(80)
 
 
-//login yapma
-app.post("/login", function (req, res) {
-    //if(req.body.username == "admin" && req.body.password == "1234"){
-        res.sendStatus(200)
-    //}else{
-    //    res.statusMessage="Kullanici adi veya parola hatali!"
-    //    res.sendStatus(403)
-    //}
-})
+var users = []
+
+
 
 io.on('connection', client => {
 
     //soket giriş yapma
-    client.on('reqsignin', function (username) {
-        console.log(username + " bağlandı.")
-        users.push({'id': client.id, 'username': username})
-        client.broadcast.emit("resuserchange", "login", client.id, username)
+    client.on('reqlogin', function (username, callback) {
+        username = username.trim()
+        if(username == ""){
+            callback(false, "Lütfen bir kullanıcı adı giriniz.")
+        }else if(username.includes('#') || username.includes('@') || username.includes(',')){
+            callback(false, "Kullanıcı adı $ @ , gibi karakterler içeremez")
+        }else if(username == "Siz" || username == "Sistem"){
+            callback(false, "Geçersiz kullanıcı adı")
+        }else{
+            console.log(username + " bağlandı.")
+            users.push({'id': client.id, 'username': username})
+            client.broadcast.emit('resnotification', "'" + username + "' adlı kullanıcı bağlandı.")
+            callback(true, "")
+        }
+    })
+
+    //soket çıkış yapma
+    client.on('reqlogout', function (callback) {
+        var user = users.filter((x, i) => x.id == client.id)
+        if(user === undefined || user[0] === undefined || user[0]['username'] === undefined) return
+        var username = user[0]['username']
+        console.log(username + " ayrıldı.")
+        client.broadcast.emit('resnotification', "'" + username + "' adlı kullanıcı ayrıldı.")
+        users = users.filter((x) => x.id != client.id)
+        callback()
     })
 
     //soket çıkış yapma
@@ -52,40 +72,26 @@ io.on('connection', client => {
         if(user === undefined || user[0] === undefined || user[0]['username'] === undefined) return
         var username = user[0]['username']
         console.log(username + " ayrıldı.")
-        client.broadcast.emit("resuserchange", "logout", client.id, username)
+        client.broadcast.emit('resnotification', "'" + username + "' adlı kullanıcı ayrıldı.")
         users = users.filter((x) => x.id != client.id)
     })
 
-    //Kullanıcı listesi isteği
-    client.on('reqgetuserlist', function (callback) {
-        //Yetkisi varsa
-        kullanicilar = users.filter(x=>x.id != client.id)
-        data = kullanicilar.map(x=>{return {'id': x.id, 'username': x.username, 'type': "user"}})
-        callback(data)
-    })
-
     //Gelen mesajlar
-    client.on('reqmessage', function (message, type, name) {
+    client.on('reqmessage', function (message, targets) {
         //Yetkisi varsa
         username = getUsername(client.id)
-        if (type == "all"){
-            client.broadcast.emit('resmessage', message, username, type, name, Now())
-        }else if(type =="room" || type == "user"){
-            socket.to(name).emit('resmessage', message, username, type, name, Now(), function () {})
+        if (targets == "all"){
+            client.broadcast.emit('resmessage', message, username, targets, Now())
+        }else{
+            targets.forEach(target => {
+                client.to(getUserId(target)).emit('resmessage', message, username, targets, Now())
+            });
         }
     })
 
-    //Toplu mesaj gönderme
-    client.on('reqgetmessage', function (type, name, callback) {
-        //Yetkisi varsa
-        callback({'message':'', 'sender':'test', 'date': Now()})
-    })
 })
 
-//html requests
-app.get("/index", function(req, res){
-    res.sendFile("/index.html", {root: viewsPath});
-});
+
 
 
 
@@ -102,4 +108,10 @@ function getUsername(id) {
     return user[0]['username']
 }
 
-server.listen(80)
+function getUserId(name) {
+    var user = users.filter(x=>x.username == name)
+    if (user === undefined) return null;
+    if (user[0] === undefined) return null;
+    if (user[0]['id'] === undefined) return null;
+    return user[0]['id']
+}
