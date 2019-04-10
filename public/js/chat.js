@@ -44,15 +44,19 @@ function msgparser(code) {
     var tokens = code.split('#')
     switch (tokens[0]) {
         case 'msg':
-            var message = tokens[2]
-            var targets = tokens[1].split("@")
-            writeMessage(message, 'Siz', targets, Now())
-            sendmessage(message, targets)
+            if(username != ""){
+                var message = tokens[2]
+                var targets = tokens[1].split("@")
+                writeMessage(message, 'Siz', targets, Now())
+                sendmessage(message, targets)
+            }
             break
         case 'all':
-            var message = code.substring(4)
-            writeMessage(message, 'Siz', "all", Now())
-            sendall(message)
+            if(username != ""){
+                var message = code.substring(4)
+                writeMessage(message, 'Siz', "all", Now())
+                sendall(message)
+            }
             break
         case 'login':
             logout(function () {
@@ -95,12 +99,17 @@ function login(name, callback) {
 
 function logout(callback) {
     socket.emit("reqlogout", callback)
+    username = ""
 }
 
 socket.on('resmessage', function (message, sender, targets, date) {
-    writeMessage(message, sender, targets, date)
+    if(username != ""){
+        writeMessage(message, sender, targets, date)
+    }
 })
 
 socket.on('resnotification', function (message) {
-    writeMessage(message, 'Sistem', '', Now())
+    if(username != ""){
+        writeMessage(message, 'Sistem', '', Now())
+    }
 })

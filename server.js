@@ -80,6 +80,7 @@ io.on('connection', client => {
     client.on('reqmessage', function (message, targets) {
         //Yetkisi varsa
         username = getUsername(client.id)
+        if (username == null)return
         if (targets == "all"){
             client.broadcast.emit('resmessage', message, username, targets, Now())
         }else{
