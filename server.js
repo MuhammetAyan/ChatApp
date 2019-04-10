@@ -21,8 +21,10 @@ app.get(/^\/public\/.*$/, function(req, res){
 });
 
 app.get("/", function (req, res) {
-    res.redirect("/login.html")
+    res.redirect("/index")
 })
+
+var users = [];
 
 //login yapma
 app.post("/login", function (req, res) {
@@ -34,9 +36,21 @@ app.post("/login", function (req, res) {
     }
 })
 
+io.on('connection', client => {
+
+    //users.push({'id': client.id, 'username': req.body.username})
+    console.log("bağlantı var:" + client.id)
+
+    client.on('disconnect', function () {
+        var i = users.filter((x, i) => x.id == client.id, i)
+        console.log(i)
+        users.splice(i, 1)
+    })
+})
+
 //html requests
-app.get(/.*\.html$/, function(req, res){
-    res.sendFile(req.url, {root: viewsPath});
+app.get("/index", function(req, res){
+    res.sendFile("/index.html", {root: viewsPath});
 });
 
 
