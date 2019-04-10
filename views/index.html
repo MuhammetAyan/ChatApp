@@ -39,7 +39,16 @@
     <!--/Login-->
     <!--Chat-->
     <div class="row align-items-center justify-content-center" ng-show="username != ''">
-        hoşgeldin {{username}}
+        <!--list-->
+        <div class="col-md-5 card">
+            <div class="" ng-repeat="user in userlist">{{user.username}}</div>
+        </div>
+        <!--/list-->
+        <!--chatpanel-->
+        <div class="col-md-7">
+
+        </div>
+        <!--/chatpanel-->
     </div>
     <!--/Chat-->
     <script src="/public/js/jquery-3.3.1.slim.min.js"></script>

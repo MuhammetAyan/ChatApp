@@ -38,14 +38,26 @@ app.post("/login", function (req, res) {
 
 io.on('connection', client => {
 
-    //users.push({'id': client.id, 'username': req.body.username})
-    console.log("bağlantı var:" + client.id)
-
-    client.on('disconnect', function () {
-        var i = users.filter((x, i) => x.id == client.id, i)
-        console.log(i)
-        users.splice(i, 1)
+    //soket giriş yapma
+    client.on('reqsignin', function (username) {
+        console.log(username + " bağlandı.")
+        users.push({'id': client.id, 'username': username})
     })
+
+    //soket çıkış yapma
+    client.on('disconnect', function () {
+        var user = users.filter((x, i) => x.id == client.id)
+        console.log(user['username'] + " ayrıldı.")
+        users = users.filter((x) => x.id != client.id)
+        
+    })
+
+    client.on('reqgetuserlist', function (callback) {
+        //Yetkisi varsa
+        callback(users)
+    })
+
+
 })
 
 //html requests

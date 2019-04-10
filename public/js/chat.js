@@ -1,6 +1,7 @@
 var app = angular.module('naber', []);
 app.controller('chat',  function($scope, $http) {
   $scope.username = "";
+  $scope.userlist = [];
 
   //login ------------------------------------------------------------
   $scope.login = {};
@@ -25,9 +26,20 @@ app.controller('chat',  function($scope, $http) {
   //chat-----------------------------------------------------------------
   $scope.chat = {};
   $scope.chat.socket = null;
+
+  //giriş yapma
   $scope.chat.connect = function () {
     $scope.chat.socket = io.connect();
-    
+    $scope.chat.socket.emit("reqsignin", $scope.username)
   }
+
+  $scope.chat.getuserlist = function () {
+    if ($scope.chat.socket){
+    $scope.chat.socket.emit("reqgetuserlist", function (data) {
+      alert(data);
+      $scope.userlist = data;
+    })
+
+  }}
   
 });
