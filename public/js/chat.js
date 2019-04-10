@@ -1,7 +1,6 @@
 var app = angular.module('naber', []);
 app.controller('chat',  function($scope, $http) {
   $scope.username = "";
-  $scope.userlist = [];
 
   //login ------------------------------------------------------------
   $scope.login = {};
@@ -31,13 +30,23 @@ app.controller('chat',  function($scope, $http) {
   $scope.chat.connect = function () {
     $scope.chat.socket = io.connect();
     $scope.chat.socket.emit("reqsignin", $scope.username)
+    $scope.chat.getuserlist();
+
+    $scope.chat.socket.on('resuserchange', function (status, id, username) {
+      if(status == "login"){
+        //$scope.userlist.push({'id': id, 'username': username});
+        userWrite(id, username)
+      }else if(status == "logout"){
+        userDelete(id)
+        //$scope.userlist = $scope.userlist.filter(x=> x.id != id)
+      }
+    })
   }
 
   $scope.chat.getuserlist = function () {
     if ($scope.chat.socket){
     $scope.chat.socket.emit("reqgetuserlist", function (data) {
-      alert(data);
-      $scope.userlist = data;
+      userlistRefresh(data);
     })
 
   }}

@@ -40,8 +40,7 @@
     <!--Chat-->
     <div class="row align-items-center justify-content-center" ng-show="username != ''">
         <!--list-->
-        <div class="col-md-5 card">
-            <div class="" ng-repeat="user in userlist">{{user.username}}</div>
+        <div class="col-md-5 card" id="userlist">
         </div>
         <!--/list-->
         <!--chatpanel-->
@@ -55,6 +54,7 @@
     <script src="/public/js/popper.min.js"></script>
     <script src="/public/js/bootstrap.min.js"></script>
     <script src="/public/js/angular.min.js"></script>
+    <script src="/public/js/chatlib.js"></script>
     <script src="/public/js/chat.js"></script>
 </body>
 </html>

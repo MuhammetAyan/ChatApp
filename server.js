@@ -26,14 +26,15 @@ app.get("/", function (req, res) {
 
 var users = [];
 
+
 //login yapma
 app.post("/login", function (req, res) {
-    if(req.body.username == "admin" && req.body.password == "1234"){
+    //if(req.body.username == "admin" && req.body.password == "1234"){
         res.sendStatus(200)
-    }else{
-        res.statusMessage="Kullanici adi veya parola hatali!"
-        res.sendStatus(403)
-    }
+    //}else{
+    //    res.statusMessage="Kullanici adi veya parola hatali!"
+    //    res.sendStatus(403)
+    //}
 })
 
 io.on('connection', client => {
@@ -42,19 +43,23 @@ io.on('connection', client => {
     client.on('reqsignin', function (username) {
         console.log(username + " bağlandı.")
         users.push({'id': client.id, 'username': username})
+        client.broadcast.emit("resuserchange", "login", client.id, username)
     })
 
     //soket çıkış yapma
     client.on('disconnect', function () {
         var user = users.filter((x, i) => x.id == client.id)
-        console.log(user['username'] + " ayrıldı.")
+        if(user == undefined ) return;
+        var username = user[0]['username'];
+        console.log(username + " ayrıldı.")
+        client.broadcast.emit("resuserchange", "logout", client.id, username)
         users = users.filter((x) => x.id != client.id)
-        
     })
 
+    //Kullanıcı listesi isteği
     client.on('reqgetuserlist', function (callback) {
         //Yetkisi varsa
-        callback(users)
+        callback(users.filter(x=>x.id != client.id))
     })
 
 
