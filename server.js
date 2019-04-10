@@ -49,8 +49,8 @@ io.on('connection', client => {
     //soket çıkış yapma
     client.on('disconnect', function () {
         var user = users.filter((x, i) => x.id == client.id)
-        if(user == undefined ) return;
-        var username = user[0]['username'];
+        if(user === undefined || user[0] === undefined || user[0]['username'] === undefined) return
+        var username = user[0]['username']
         console.log(username + " ayrıldı.")
         client.broadcast.emit("resuserchange", "logout", client.id, username)
         users = users.filter((x) => x.id != client.id)
@@ -59,7 +59,20 @@ io.on('connection', client => {
     //Kullanıcı listesi isteği
     client.on('reqgetuserlist', function (callback) {
         //Yetkisi varsa
-        callback(users.filter(x=>x.id != client.id))
+        kullanicilar = users.filter(x=>x.id != client.id)
+        data = kullanicilar.map(x=>{return {'id': x.id, 'username': x.username}})
+        callback(data)
+    })
+
+    //Gelen mesajlar
+    client.on('reqmessage', function (message, type, name) {
+        //Yetkisi varsa
+        username = getUsername(client.id)
+        if (type == "all"){
+            client.broadcast.emit('resmessage', message, username, type, name, Now())
+        }else if(type =="room" || type == "user"){
+            socket.to(name).emit('resmessage', message, username, type, name, Now(), function () {})
+        }
     })
 
 
@@ -70,5 +83,19 @@ app.get("/index", function(req, res){
     res.sendFile("/index.html", {root: viewsPath});
 });
 
+
+
+function Now() {
+    var now = new Date();
+    return now.getHours() + ":" + now.getMinutes()
+}
+
+function getUsername(id) {
+    var user = users.filter(x=>x.id == id)
+    if (user === undefined) return null;
+    if (user[0] === undefined) return null;
+    if (user[0]['username'] === undefined) return null;
+    return user[0]['username']
+}
 
 server.listen(80)

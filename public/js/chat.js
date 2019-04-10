@@ -25,6 +25,8 @@ app.controller('chat',  function($scope, $http) {
   //chat-----------------------------------------------------------------
   $scope.chat = {};
   $scope.chat.socket = null;
+  $scope.chat.activetype = "all";
+  $scope.chat.activename = "";
 
   //giriş yapma
   $scope.chat.connect = function () {
@@ -32,23 +34,45 @@ app.controller('chat',  function($scope, $http) {
     $scope.chat.socket.emit("reqsignin", $scope.username)
     $scope.chat.getuserlist();
 
+    //user changed
     $scope.chat.socket.on('resuserchange', function (status, id, username) {
       if(status == "login"){
-        //$scope.userlist.push({'id': id, 'username': username});
         userWrite(id, username)
       }else if(status == "logout"){
         userDelete(id)
-        //$scope.userlist = $scope.userlist.filter(x=> x.id != id)
+      }
+    })
+
+    //received messages
+    $scope.chat.socket.on('resmessage', function (message, sender, type, name, date) {
+      //Yetkisi varsa
+      if (type == $scope.chat.activetype && name == $scope.chat.activename){
+        messageWrite(message, sender, date);
+      }else{
+        alert("bildirim");
       }
     })
   }
 
+  //kullanıcı listesi isteği
   $scope.chat.getuserlist = function () {
     if ($scope.chat.socket){
     $scope.chat.socket.emit("reqgetuserlist", function (data) {
       userlistRefresh(data);
     })
-
   }}
+
+  //message send
+  $scope.chat.sendmessage = function (message, username) {
+    if (message != ''){
+      $scope.chat.socket.emit("reqmessage", message, $scope.chat.activetype, $scope.chat.activename)
+      messageWrite(message, 'Siz', Now())
+    }
+  }
+  
+  $('#send').on('click', function () {
+    $scope.chat.sendmessage($('#chatinput').val());
+    $('#chatinput').val('');
+  })
   
 });
